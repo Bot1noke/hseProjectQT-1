@@ -1,19 +1,19 @@
-#ifndef DIALOG_H
-#define DIALOG_H
+#ifndef TABLES_H
+#define TABLES_H
 
 #include <QDialog>
 
 namespace Ui {
-class Dialog;
+class tables;
 }
 
-class Dialog : public QDialog
+class tables : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit Dialog(QWidget *parent = nullptr);
-    ~Dialog();
+    explicit tables(QWidget *parent = nullptr);
+    ~tables();
     struct perc_stat_of_player
     {
         double gs_gp;
@@ -22,12 +22,9 @@ public:
         double twoP_twoPA;
     };
     std::map <QString, std::vector<perc_stat_of_player>> perc_stat_of_players;
-private slots:
-
-    void on_pushButton_2_clicked();
 
 private:
-    Ui::Dialog *ui;
+    Ui::tables *ui;
 };
 
-#endif
+#endif // TABLES_H

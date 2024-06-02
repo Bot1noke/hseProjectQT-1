@@ -1,48 +1,48 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "dialog.h"
+#include "tables.h"
 #include <QFile>
 #include <QTextStream>
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QHeaderView>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
-
     tableWidget = new QTableWidget(this);
     setCentralWidget(tableWidget);
-    tableWidget->setColumnCount(23); // Adjust columns based on your CSV
+    tableWidget->setColumnCount(23);
     tableWidget->setHorizontalHeaderLabels({
         "Player Name", "Salary", "Position", "Age", "Team", "Games Played", "Games Started","Min/Game", "FG", "FGA", "3P", "3PA",
         "2P", "2PA", "ORB", "DRB", "AST", "STL", "BLK", "PF", "PTS", "Total minutes", "PER",
     });
-
     toolBar = new QToolBar(this);
     addToolBar(toolBar);
-
     addButton = new QPushButton("Add Player", this);
     deleteButton = new QPushButton("Delete Player", this);
     uploadButton = new QPushButton("Upload Dataset", this);
     dataAnalysisButton = new QPushButton("Data Analysis", this);
     uploadButton->setStyleSheet("background-color: red; color: white;");
-
     toolBar->addWidget(addButton);
     toolBar->addWidget(deleteButton);
     toolBar->addWidget(uploadButton);
     toolBar->addWidget(dataAnalysisButton);
-
     connect(addButton, &QPushButton::clicked, this, &MainWindow::addPlayer);
     connect(deleteButton, &QPushButton::clicked, this, &MainWindow::deletePlayer);
     connect(uploadButton, &QPushButton::clicked, this, &MainWindow::uploadDataset);
     connect(dataAnalysisButton, &QPushButton::clicked, this, &MainWindow::openDataAnalysis);
+
+    tableWidget->setSortingEnabled(true); // Enable sorting
+
+    connect(tableWidget->horizontalHeader(), &QHeaderView::sectionClicked, this, &MainWindow::sortData);
 }
 
 MainWindow::~MainWindow() {
     delete ui;
 }
-
 void MainWindow::readCSV(const QString &filename) {
     QFile file(filename);
     if (file.open(QIODevice::ReadOnly)) {
@@ -75,16 +75,28 @@ void MainWindow::readCSV(const QString &filename) {
             p.tm = fields[21].toInt();
             p.per = fields[22].toDouble();
             players[fields[0]].push_back(p);
+            perc_stat_of_player stat;
+            stat.gs_gp = p.gs / p.gp * 100;
+            stat.fg_fga = p.fg / p.fga * 100;
+            stat.threeP_threePA = p.threeP / p.threePA * 100;
+            stat.twoP_twoPA = p.twoP / p.twoPA * 100;
+            perc_stat_of_players[fields[0]].push_back(stat);
             tableWidget->insertRow(row);
             for (int col = 0; col < fields.size(); ++col) {
                 tableWidget->setItem(row, col, new QTableWidgetItem(fields[col]));
+                bool isNumber;
+                fields[col].toDouble(&isNumber);
+                if (isNumber) {
+                    tableWidget->setItem(row, col, new CustomTableWidgetItem(fields[col]));
+                } else {
+                    tableWidget->setItem(row, col, new QTableWidgetItem(fields[col]));
+                }
             }
             ++row;
         }
         file.close();
     }
 }
-
 void MainWindow::writeCSV(const QString &filename) {
     QFile file(filename);
     if (file.open(QIODevice::WriteOnly)) {
@@ -99,7 +111,6 @@ void MainWindow::writeCSV(const QString &filename) {
         file.close();
     }
 }
-
 void MainWindow::addPlayer() {
     QStringList labels = {
         "Player Name", "Salary", "Position", "Age", "Team", "Games Played", "Games Started","Min/Game", "FG", "FGA", "3P", "3PA",
@@ -117,6 +128,13 @@ void MainWindow::addPlayer() {
         else
             fields.push_back(value);
         tableWidget->setItem(row, col, new QTableWidgetItem(value));
+        bool isNumber;
+        value.toDouble(&isNumber);
+        if (isNumber) {
+            tableWidget->setItem(row, col, new CustomTableWidgetItem(value));
+        } else {
+            tableWidget->setItem(row, col, new QTableWidgetItem(value));
+        }
     }
     player p;
     p.sal = fields[1].toInt();
@@ -142,14 +160,22 @@ void MainWindow::addPlayer() {
     p.tm = fields[21].toInt();
     p.per = fields[22].toDouble();
     players[name].push_back(p);
-    //qDebug() << name << p.sal << p.pos << p.age << p.team;
+    perc_stat_of_player stat;
+    stat.gs_gp = p.gs / p.gp * 100;
+    stat.fg_fga = p.fg / p.fga * 100;
+    stat.threeP_threePA = p.threeP / p.threePA * 100;
+    stat.twoP_twoPA = p.twoP / p.twoPA * 100;
+    perc_stat_of_players[name].push_back(stat);
     writeCSV("data.csv");
 }
+
+
 
 void MainWindow::deletePlayer() {
     int row = tableWidget->currentRow();
     QTableWidgetItem *firstItem = tableWidget->item(row, 0);
     players.erase(firstItem->text());
+    perc_stat_of_players.erase(firstItem->text());
     if (row != -1) {
         tableWidget->removeRow(row);
         writeCSV("data.csv");
@@ -157,7 +183,6 @@ void MainWindow::deletePlayer() {
         QMessageBox::warning(this, "Delete Player", "No player selected");
     }
 }
-
 void MainWindow::uploadDataset() {
     QString filename = QFileDialog::getOpenFileName(this, "Open CSV File", QDir::homePath() + "/Downloads", "CSV Files (*.csv)");
     if (!filename.isEmpty()) {
@@ -165,8 +190,12 @@ void MainWindow::uploadDataset() {
         readCSV(filename);
     }
 }
-
 void MainWindow::openDataAnalysis() {
     Dialog *dialog = new Dialog(this);
+    dialog->setWindowTitle("DataAnalysis");
     dialog->exec();
+}
+
+void MainWindow::sortData(int column) {
+    tableWidget->sortByColumn(column, tableWidget->horizontalHeader()->sortIndicatorOrder());
 }
