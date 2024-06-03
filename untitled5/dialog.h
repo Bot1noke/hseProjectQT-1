@@ -2,6 +2,8 @@
 #define DIALOG_H
 
 #include <QDialog>
+#include "structure_player.h"
+#include "players.h"
 
 namespace Ui {
 class Dialog;
@@ -14,14 +16,8 @@ class Dialog : public QDialog
 public:
     explicit Dialog(QWidget *parent = nullptr);
     ~Dialog();
-    struct perc_stat_of_player
-    {
-        double gs_gp;
-        double fg_fga;
-        double threeP_threePA;
-        double twoP_twoPA;
-    };
-    std::map <QString, std::vector<perc_stat_of_player>> perc_stat_of_players;
+    std::map <QString, perc_stat_of_player> perc_stat_of_players;
+    std::map <QString, player> players;
 private slots:
 
     void on_pushButton_2_clicked();

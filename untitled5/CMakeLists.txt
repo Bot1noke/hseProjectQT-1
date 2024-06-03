@@ -33,6 +33,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ../.gitignore
         tables.h tables.cpp tables.ui
         customtablewidgetitem.h customtablewidgetitem.cpp
+        structure_player.h
+        players.h
     )
 else()
     if(ANDROID)

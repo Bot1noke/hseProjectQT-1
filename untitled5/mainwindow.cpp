@@ -8,6 +8,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QHeaderView>
+#include "structure_player.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -56,8 +57,8 @@ void MainWindow::readCSV(const QString &filename) {
             p.pos = fields[2];
             p.age = fields[3].toInt();
             p.team = fields[4];
-            p.gp = fields[5].toInt();
-            p.gs = fields[6].toInt();
+            p.gp = fields[5].toDouble();
+            p.gs = fields[6].toDouble();
             p.mg = fields[7].toDouble();
             p.fg = fields[8].toDouble();
             p.fga = fields[9].toDouble();
@@ -74,13 +75,13 @@ void MainWindow::readCSV(const QString &filename) {
             p.pts = fields[20].toDouble();
             p.tm = fields[21].toInt();
             p.per = fields[22].toDouble();
-            players[fields[0]].push_back(p);
+            players[fields[0]] = p;
             perc_stat_of_player stat;
-            stat.gs_gp = p.gs / p.gp * 100;
-            stat.fg_fga = p.fg / p.fga * 100;
-            stat.threeP_threePA = p.threeP / p.threePA * 100;
-            stat.twoP_twoPA = p.twoP / p.twoPA * 100;
-            perc_stat_of_players[fields[0]].push_back(stat);
+            stat.gs_gp = (p.gs / p.gp) * 100.0;
+            stat.fg_fga = (p.fg / p.fga) * 100.0;
+            stat.threeP_threePA = (p.threeP / p.threePA) * 100.0;
+            stat.twoP_twoPA = (p.twoP / p.twoPA) * 100.0;
+            perc_stat_of_players[fields[0]] = stat;
             tableWidget->insertRow(row);
             for (int col = 0; col < fields.size(); ++col) {
                 tableWidget->setItem(row, col, new QTableWidgetItem(fields[col]));
@@ -141,8 +142,8 @@ void MainWindow::addPlayer() {
     p.pos = fields[2];
     p.age = fields[3].toInt();
     p.team = fields[4];
-    p.gp = fields[5].toInt();
-    p.gs = fields[6].toInt();
+    p.gp = fields[5].toDouble();
+    p.gs = fields[6].toDouble();
     p.mg = fields[7].toDouble();
     p.fg = fields[8].toDouble();
     p.fga = fields[9].toDouble();
@@ -159,13 +160,13 @@ void MainWindow::addPlayer() {
     p.pts = fields[20].toDouble();
     p.tm = fields[21].toInt();
     p.per = fields[22].toDouble();
-    players[name].push_back(p);
+    players[name] = p;
     perc_stat_of_player stat;
     stat.gs_gp = p.gs / p.gp * 100;
     stat.fg_fga = p.fg / p.fga * 100;
     stat.threeP_threePA = p.threeP / p.threePA * 100;
     stat.twoP_twoPA = p.twoP / p.twoPA * 100;
-    perc_stat_of_players[name].push_back(stat);
+    perc_stat_of_players[name] = stat;
     writeCSV("data.csv");
 }
 
@@ -193,6 +194,8 @@ void MainWindow::uploadDataset() {
 void MainWindow::openDataAnalysis() {
     Dialog *dialog = new Dialog(this);
     dialog->setWindowTitle("DataAnalysis");
+    dialog->perc_stat_of_players = perc_stat_of_players;
+    dialog->players = players;
     dialog->exec();
 }
 
