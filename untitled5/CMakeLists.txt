@@ -54,7 +54,7 @@ target_link_libraries(untitled5 PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_link_libraries(untitled5 PRIVATE Qt${QT_VERSION_MAJOR}::Gui)
 target_link_libraries(untitled5 PRIVATE Qt${QT_VERSION_MAJOR}::Charts)
 target_link_libraries(untitled5 PRIVATE Qt${QT_VERSION_MAJOR}::Widgets PRIVATE Qt${QT_VERSION_MAJOR}::PrintSupport)
-
+set_source_files_properties(qcustomplot.cpp PROPERTIES SKIP_AUTOMOC ON)
 if(${QT_VERSION} VERSION_LESS 6.1.0)
   set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.untitled5)
 endif()
