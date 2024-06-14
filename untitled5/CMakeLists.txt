@@ -35,6 +35,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         customtablewidgetitem.h customtablewidgetitem.cpp
         structure_player.h
         players.h
+        generate_plot.py
+        graphs.h graphs.cpp graphs.ui
+        #plot.png
     )
 else()
     if(ANDROID)

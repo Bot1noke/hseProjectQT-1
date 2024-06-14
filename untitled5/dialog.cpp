@@ -2,6 +2,7 @@
 #include "ui_dialog.h"
 #include "tables.h"
 #include "structure_player.h"
+#include "graphs.h"
 
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
@@ -24,3 +25,13 @@ void Dialog::on_pushButton_2_clicked()
     window.setWindowTitle("Tables");
     window.exec();
 }
+
+void Dialog::on_pushButton_clicked()
+{
+    graphs window;
+    window.graph();
+    window.resize(800, 600);
+    window.setWindowTitle("Graphs");
+    window.exec();
+}
+

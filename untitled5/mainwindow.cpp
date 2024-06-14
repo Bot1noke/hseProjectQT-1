@@ -8,13 +8,31 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QHeaderView>
+#include <QLabel>
+#include <QPixmap>
+#include <QProcess>
 #include "structure_player.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
     tableWidget = new QTableWidget(this);
-    setCentralWidget(tableWidget);
+     setCentralWidget(tableWidget);
+    // QVBoxLayout *layout = new QVBoxLayout(tableWidget);
+
+    // // Запускаем скрипт для генерации графика
+    // QProcess process;
+    // process.start("python3", QStringList() << "generate_plot.py");
+    // process.waitForFinished();
+
+    // // Создаем QLabel и добавляем его в layout
+    // QLabel *label = new QLabel(this);
+    // QPixmap pixmap("plot.png");
+    // label->setPixmap(pixmap);
+    // layout->addWidget(label);
+
+    // // Устанавливаем layout как основной для центрального виджета
+    // tableWidget->setLayout(layout);
     tableWidget->setColumnCount(23);
     tableWidget->setHorizontalHeaderLabels({
         "Player Name", "Salary", "Position", "Age", "Team", "Games Played", "Games Started","Min/Game", "FG", "FGA", "3P", "3PA",
